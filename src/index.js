@@ -35,24 +35,32 @@ const getUserCity = async () =>
     )
   ).city.names.en;
 
-const changeMode = (cb, data, mode) =>
-  cb(data, mode === "metric" ? "imperial" : "metric");
+const changeSystem = (cb, data, sys) =>
+  cb(data, sys === "metric" ? "imperial" : "metric");
 
-const changeModeOnClick =
+const changeSystemOnClick =
   (...elements) =>
-  (cb, data, mode) =>
+  (cb, data, sys) =>
     elements.forEach((element) =>
-      element.addEventListener("click", () => changeMode(cb, data, mode))
+      element.addEventListener("click", () => changeSystem(cb, data, sys))
     );
 
-const parseTemperature = (temp, mode) =>
-  mode === "metric" ? `${temp}°C` : `${temp}°F`;
+const format = (txt) => (val, mode) => {
+  const isMetric = mode === "metric";
+  switch (txt) {
+    case "temp":
+      return isMetric ? `${val}°C` : `${val}°F`;
+    case "wind":
+      return isMetric ? `${val}kph` : `${val}mph`;
+    default:
+  }
+};
 
-const displayWeather = async (data, mode) => {
+const displayWeather = async ({ locationName, temp, feel, wind }, sys) => {
   const article = document.createElement("article");
 
   const heading = document.createElement("h2");
-  heading.textContent = data.locationName;
+  heading.textContent = locationName;
   article.appendChild(heading);
 
   const definitionList = document.createElement("dl");
@@ -62,7 +70,7 @@ const displayWeather = async (data, mode) => {
   definitionList.appendChild(tempTerm);
 
   const tempValue = document.createElement("dd");
-  tempValue.textContent = parseTemperature(data.temp[mode], mode);
+  tempValue.textContent = format("temp")(temp[sys], sys);
   definitionList.appendChild(tempValue);
 
   const feelTerm = document.createElement("dt");
@@ -70,7 +78,7 @@ const displayWeather = async (data, mode) => {
   definitionList.appendChild(feelTerm);
 
   const feelValue = document.createElement("dd");
-  feelValue.textContent = data.feel[mode];
+  feelValue.textContent = format("temp")(feel[sys], sys);
   definitionList.appendChild(feelValue);
 
   const windTerm = document.createElement("dt");
@@ -78,13 +86,13 @@ const displayWeather = async (data, mode) => {
   definitionList.appendChild(windTerm);
 
   const windValue = document.createElement("dd");
-  windValue.textContent = data.wind[mode];
+  windValue.textContent = format("wind")(wind[sys], sys);
   definitionList.appendChild(windValue);
 
-  changeModeOnClick(tempValue, feelValue, windValue)(
+  changeSystemOnClick(tempValue, feelValue, windValue)(
     displayWeather,
-    data,
-    mode
+    { locationName, temp, feel, wind },
+    sys
   );
 
   article.appendChild(definitionList);
