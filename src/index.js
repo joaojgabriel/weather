@@ -57,21 +57,21 @@ const displayWeather = async (data, mode) => {
 
   const definitionList = document.createElement("dl");
 
-  const temperatureTerm = document.createElement("dt");
-  temperatureTerm.textContent = "Temperature";
-  definitionList.appendChild(temperatureTerm);
+  const tempTerm = document.createElement("dt");
+  tempTerm.textContent = "Temperature";
+  definitionList.appendChild(tempTerm);
 
-  const temperatureValue = document.createElement("dd");
-  temperatureValue.textContent = parseTemperature(data.temp[mode], mode);
-  definitionList.appendChild(temperatureValue);
+  const tempValue = document.createElement("dd");
+  tempValue.textContent = parseTemperature(data.temp[mode], mode);
+  definitionList.appendChild(tempValue);
 
-  const feelsLikeTerm = document.createElement("dt");
-  feelsLikeTerm.textContent = "Feels like";
-  definitionList.appendChild(feelsLikeTerm);
+  const feelTerm = document.createElement("dt");
+  feelTerm.textContent = "Feels like";
+  definitionList.appendChild(feelTerm);
 
-  const feelsLikeValue = document.createElement("dd");
-  feelsLikeValue.textContent = data.feel[mode];
-  definitionList.appendChild(feelsLikeValue);
+  const feelValue = document.createElement("dd");
+  feelValue.textContent = data.feel[mode];
+  definitionList.appendChild(feelValue);
 
   const windTerm = document.createElement("dt");
   windTerm.textContent = "Wind";
@@ -81,7 +81,7 @@ const displayWeather = async (data, mode) => {
   windValue.textContent = data.wind[mode];
   definitionList.appendChild(windValue);
 
-  changeModeOnClick(temperatureValue, feelsLikeValue, windValue)(
+  changeModeOnClick(tempValue, feelValue, windValue)(
     displayWeather,
     data,
     mode
