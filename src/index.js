@@ -56,9 +56,6 @@ const displayWeather = async (weatherData, mode) => {
 
   const temperatureValue = document.createElement("dd");
   temperatureValue.textContent = parseTemperature(weatherData.temp[mode], mode);
-  temperatureValue.removeEventListener("click", () =>
-    changeMode(displayWeather, weatherData, mode)
-  );
   temperatureValue.addEventListener("click", () =>
     changeMode(displayWeather, weatherData, mode)
   );
@@ -70,9 +67,6 @@ const displayWeather = async (weatherData, mode) => {
 
   const feelsLikeValue = document.createElement("dd");
   feelsLikeValue.textContent = weatherData.feel[mode];
-  feelsLikeValue.removeEventListener("click", () =>
-    changeMode(displayWeather, weatherData, mode)
-  );
   feelsLikeValue.addEventListener("click", () =>
     changeMode(displayWeather, weatherData, mode)
   );
@@ -84,9 +78,6 @@ const displayWeather = async (weatherData, mode) => {
 
   const windValue = document.createElement("dd");
   windValue.textContent = weatherData.wind[mode];
-  temperatureValue.removeEventListener("click", () =>
-    changeMode(displayWeather, weatherData, mode)
-  );
   windValue.addEventListener("click", () =>
     changeMode(displayWeather, weatherData, mode)
   );
