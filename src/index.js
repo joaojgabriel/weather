@@ -4,7 +4,7 @@ const getData = (url) => fetch(url, { mode: "cors" }).then((res) => res.json());
 
 const getWeather = async (location) => {
   const data = await getData(
-    `https://api.weatherapi.com/v1/current.json?key=8a3c2504ff81406191d14901230705&q=${location.trim()}&aqi=no`
+    `https://api.weatherapi.com/v1/current.json?key=8a3c2504ff81406191d14901230705&q=${location}&aqi=no`
   );
 
   return {
@@ -38,3 +38,10 @@ const logWeather = async (location) => console.log(await getWeather(location));
 const logUserWeather = async () => logWeather(await getUserCity());
 
 logUserWeather();
+
+document.querySelector("form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (document.querySelector("input").value) {
+    logWeather(document.querySelector("input").value.trim());
+  }
+});
