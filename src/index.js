@@ -38,14 +38,21 @@ const getUserCity = async () =>
 const changeMode = (cb, data, mode) =>
   cb(data, mode === "metric" ? "imperial" : "metric");
 
-const parseTemperature = (data, mode) =>
-  mode === "metric" ? `${data}°C` : `${data}°F`;
+const changeModeOnClick =
+  (...elements) =>
+  (cb, data, mode) =>
+    elements.forEach((element) =>
+      element.addEventListener("click", () => changeMode(cb, data, mode))
+    );
 
-const displayWeather = async (weatherData, mode) => {
+const parseTemperature = (temp, mode) =>
+  mode === "metric" ? `${temp}°C` : `${temp}°F`;
+
+const displayWeather = async (data, mode) => {
   const article = document.createElement("article");
 
   const heading = document.createElement("h2");
-  heading.textContent = weatherData.locationName;
+  heading.textContent = data.locationName;
   article.appendChild(heading);
 
   const definitionList = document.createElement("dl");
@@ -55,10 +62,7 @@ const displayWeather = async (weatherData, mode) => {
   definitionList.appendChild(temperatureTerm);
 
   const temperatureValue = document.createElement("dd");
-  temperatureValue.textContent = parseTemperature(weatherData.temp[mode], mode);
-  temperatureValue.addEventListener("click", () =>
-    changeMode(displayWeather, weatherData, mode)
-  );
+  temperatureValue.textContent = parseTemperature(data.temp[mode], mode);
   definitionList.appendChild(temperatureValue);
 
   const feelsLikeTerm = document.createElement("dt");
@@ -66,10 +70,7 @@ const displayWeather = async (weatherData, mode) => {
   definitionList.appendChild(feelsLikeTerm);
 
   const feelsLikeValue = document.createElement("dd");
-  feelsLikeValue.textContent = weatherData.feel[mode];
-  feelsLikeValue.addEventListener("click", () =>
-    changeMode(displayWeather, weatherData, mode)
-  );
+  feelsLikeValue.textContent = data.feel[mode];
   definitionList.appendChild(feelsLikeValue);
 
   const windTerm = document.createElement("dt");
@@ -77,11 +78,14 @@ const displayWeather = async (weatherData, mode) => {
   definitionList.appendChild(windTerm);
 
   const windValue = document.createElement("dd");
-  windValue.textContent = weatherData.wind[mode];
-  windValue.addEventListener("click", () =>
-    changeMode(displayWeather, weatherData, mode)
-  );
+  windValue.textContent = data.wind[mode];
   definitionList.appendChild(windValue);
+
+  changeModeOnClick(temperatureValue, feelsLikeValue, windValue)(
+    displayWeather,
+    data,
+    mode
+  );
 
   article.appendChild(definitionList);
 
