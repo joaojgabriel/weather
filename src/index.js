@@ -7,6 +7,8 @@ const getWeather = async (location) => {
     `https://api.weatherapi.com/v1/current.json?key=8a3c2504ff81406191d14901230705&q=${location}&aqi=no`
   );
 
+  if (data.error) return data.error.message;
+
   return {
     locationName: data.location.name,
     condition: data.current.condition.text,
