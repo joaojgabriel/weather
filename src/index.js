@@ -35,6 +35,17 @@ const getWeather = async (location) => {
   }
 };
 
+const getUserCity = async () =>
+  (
+    await getData(
+      `https://api.geoapify.com/v1/ipinfo?apiKey=152aeca885dd48eb94281c67f8967a60`
+    )
+  ).city.names.en;
+
 const logWeather = async (location) => console.log(await getWeather(location));
 
-logWeather("   New York  ");
+const logUserWeather = async () => {
+  logWeather(await getUserCity());
+};
+
+logUserWeather();
