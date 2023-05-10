@@ -71,6 +71,9 @@ const elList = (...elements) =>
   });
 
 const showWeather = ({ city, temp, feel, wind }, system) => {
+  const oldArticle = document.querySelector("article");
+  if (oldArticle) oldArticle.remove();
+
   const article = create("article");
   article.append(create("h2", city));
 
