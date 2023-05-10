@@ -10,7 +10,7 @@ const getWeather = async (location) => {
   if (data.error) return data.error.message;
 
   return {
-    locationName: data.location.name,
+    city: data.location.name,
     condition: data.current.condition.text,
     temp: {
       metric: data.current.temp_c,
@@ -35,80 +35,80 @@ const getUserCity = async () =>
     )
   ).city.names.en;
 
-const changeSystem = (cb, data, sys) =>
-  cb(data, sys === "metric" ? "imperial" : "metric");
+const changeSystem = (cb, data, system) =>
+  cb(data, system === "metric" ? "imperial" : "metric");
 
 const changeSystemOnClick =
   (...elements) =>
-  (cb, data, sys) =>
+  (cb, data, system) =>
     elements.forEach((element) =>
-      element.addEventListener("click", () => changeSystem(cb, data, sys))
+      element.addEventListener("click", () => changeSystem(cb, data, system))
     );
 
-const format = (txt) => (val, mode) => {
-  const isMetric = mode === "metric";
+const format = (txt) => (val, system) => {
+  const isMetric = system === "metric";
   switch (txt) {
     case "temp":
       return isMetric ? `${val}°C` : `${val}°F`;
     case "wind":
       return isMetric ? `${val}kph` : `${val}mph`;
     default:
+      return "";
   }
 };
 
-const displayWeather = async ({ locationName, temp, feel, wind }, sys) => {
-  const article = document.createElement("article");
-
-  const heading = document.createElement("h2");
-  heading.textContent = locationName;
-  article.appendChild(heading);
-
-  const definitionList = document.createElement("dl");
-
-  const tempTerm = document.createElement("dt");
-  tempTerm.textContent = "Temperature";
-  definitionList.appendChild(tempTerm);
-
-  const tempValue = document.createElement("dd");
-  tempValue.textContent = format("temp")(temp[sys], sys);
-  definitionList.appendChild(tempValue);
-
-  const feelTerm = document.createElement("dt");
-  feelTerm.textContent = "Feels like";
-  definitionList.appendChild(feelTerm);
-
-  const feelValue = document.createElement("dd");
-  feelValue.textContent = format("temp")(feel[sys], sys);
-  definitionList.appendChild(feelValue);
-
-  const windTerm = document.createElement("dt");
-  windTerm.textContent = "Wind";
-  definitionList.appendChild(windTerm);
-
-  const windValue = document.createElement("dd");
-  windValue.textContent = format("wind")(wind[sys], sys);
-  definitionList.appendChild(windValue);
-
-  changeSystemOnClick(tempValue, feelValue, windValue)(
-    displayWeather,
-    { locationName, temp, feel, wind },
-    sys
-  );
-
-  article.appendChild(definitionList);
-
-  document.body.appendChild(article);
+const create = (el, txt) => {
+  const element = document.createElement(el);
+  if (txt) element.textContent = txt;
+  return element;
 };
 
-const displayUserWeather = async () =>
-  displayWeather(await getWeather(await getUserCity()), "metric");
+const elList = (...elements) =>
+  elements.map((el) => {
+    if (el instanceof Node) return el;
+    if (Array.isArray(el)) return create(...el);
+    return create(el);
+  });
 
-displayUserWeather();
+const showWeather = ({ city, temp, feel, wind }, system) => {
+  const article = create("article");
+  article.append(create("h2", city));
+
+  const definitionList = create("dl");
+  const tempVal = create("dd", format("temp")(temp[system], system));
+  const feelVal = create("dd", format("temp")(feel[system], system));
+  const windVal = create("dd", format("wind")(wind[system], system));
+  definitionList.append(
+    ...elList(
+      ["dt", "Temperature"],
+      tempVal,
+      ["dt", "Feels like"],
+      feelVal,
+      ["dt", "Wind"],
+      windVal
+    )
+  );
+
+  changeSystemOnClick(tempVal, feelVal, windVal)(
+    showWeather,
+    { city, temp, feel, wind },
+    system
+  );
+
+  article.append(definitionList);
+
+  document.body.append(article);
+};
+
+const showUserWeather = async () =>
+  showWeather(await getWeather(await getUserCity()), "metric");
+
+showUserWeather();
 
 document.querySelector("form").addEventListener("submit", async (e) => {
   e.preventDefault();
   const query = document.querySelector("input").value;
   if (query) {
-    displayWeather(await getWeather(query.trim()), "metric");
+    showWeather(await getWeather(query.trim()), "metric");
   }
 });
