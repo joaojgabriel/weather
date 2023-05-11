@@ -132,7 +132,7 @@ const showWeather = async ({ city, condition, temp, feel, wind }, system) => {
 
   changeSystemOnClick(tempVal, feelVal, windVal)(
     showWeather,
-    { city, temp, feel, wind },
+    { city, condition, temp, feel, wind },
     system
   );
 };
