@@ -57,16 +57,29 @@ const format = (txt) => (val, system) => {
   }
 };
 
-const create = (el, txt) => {
+const create = (el, txt, ...classes) => {
+  if (el instanceof Node) return el;
+
   const element = document.createElement(el);
+
   if (txt) element.textContent = txt;
+  if (classes) classes.forEach((c) => element.classList.add(c));
+
   return element;
 };
 
-const elList = (...elements) =>
+const createStruct = (...elements) =>
   elements.map((el) => {
     if (el instanceof Node) return el;
-    if (Array.isArray(el)) return create(...el);
+    if (Array.isArray(el)) {
+      if (el[0] instanceof Node) return el[0];
+
+      if (el[1] && typeof el[1] === "string") return create(...el);
+
+      const parent = Array.isArray(el[0]) ? create(...el[0]) : create(el[0]);
+      parent.append(...createStruct(...el[1]));
+      return parent;
+    }
     return create(el);
   });
 
@@ -74,22 +87,28 @@ const showWeather = ({ city, temp, feel, wind }, system) => {
   const oldArticle = document.querySelector("article");
   if (oldArticle) oldArticle.remove();
 
-  const article = create("article");
-  article.append(create("h2", city));
+  const tempVal = create("dd", format("temp")(temp[system], system), "temp");
+  const feelVal = create("dd", format("temp")(feel[system], system), "feel");
+  const windVal = create("dd", format("wind")(wind[system], system), "wind");
 
-  const definitionList = create("dl");
-  const tempVal = create("dd", format("temp")(temp[system], system));
-  const feelVal = create("dd", format("temp")(feel[system], system));
-  const windVal = create("dd", format("wind")(wind[system], system));
-  definitionList.append(
-    ...elList(
-      ["dt", "Temperature"],
-      tempVal,
-      ["dt", "Feels like"],
-      feelVal,
-      ["dt", "Wind"],
-      windVal
-    )
+  document.body.append(
+    ...createStruct([
+      "article",
+      [
+        ["h2", city],
+        [
+          "dl",
+          [
+            ["dt", "Temperature"],
+            [tempVal],
+            ["dt", "Feels like"],
+            [feelVal],
+            ["dt", "Wind"],
+            [windVal],
+          ],
+        ],
+      ],
+    ])
   );
 
   changeSystemOnClick(tempVal, feelVal, windVal)(
@@ -97,10 +116,6 @@ const showWeather = ({ city, temp, feel, wind }, system) => {
     { city, temp, feel, wind },
     system
   );
-
-  article.append(definitionList);
-
-  document.body.append(article);
 };
 
 const showUserWeather = async () =>
