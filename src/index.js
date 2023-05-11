@@ -81,13 +81,27 @@ const createStruct = (...elements) =>
     return create(el);
   });
 
+const load = () => {
+  if (document.querySelector(".loading")) {
+    document.querySelector(".loading").remove();
+  }
+
+  if (document.querySelector(".weather")) {
+    document.querySelector(".weather").remove();
+  }
+
+  document.body.append(
+    ...createStruct(["article", [["p", "Loading...", "loading"]]])
+  );
+};
+
 const showWeather = async ({ city, condition, temp, feel, wind }, system) => {
-  const oldArticle = document.querySelector("article");
-  if (oldArticle) oldArticle.remove();
+  load();
 
   const gifData = await getData(
     `https://api.giphy.com/v1/gifs/translate?api_key=EJ5mLTdeAdWwx7wckwHCGwzbDLmU0HDR&s=${condition}`
   );
+  document.querySelector(".loading").remove();
   const gif = create("img");
   gif.src = gifData.data.images.original.url;
 
@@ -97,7 +111,7 @@ const showWeather = async ({ city, condition, temp, feel, wind }, system) => {
 
   document.body.append(
     ...createStruct([
-      "article",
+      ["article", "", "weather"],
       [
         ["h2", city],
         [
@@ -128,10 +142,13 @@ const showUserWeather = async () =>
 
 showUserWeather();
 
+window.onload = load;
+
 document.querySelector("form").addEventListener("submit", async (e) => {
   e.preventDefault();
   const query = document.querySelector("input").value;
   if (query) {
+    load();
     showWeather(await getWeather(query.trim()), "metric");
   }
 });
