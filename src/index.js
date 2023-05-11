@@ -23,7 +23,6 @@ const getWeather = async (location) => {
     wind: {
       metric: data.current.wind_kph,
       imperial: data.current.wind_mph,
-      degree: data.current.wind_degree,
     },
   };
 };
