@@ -45,12 +45,11 @@ const changeSystemOnClick =
     );
 
 const format = (txt) => (val, system) => {
-  const isMetric = system === "metric";
   switch (txt) {
     case "temp":
-      return isMetric ? `${val}°C` : `${val}°F`;
+      return system === "metric" ? `${val}°C` : `${val}°F`;
     case "wind":
-      return isMetric ? `${val}kph` : `${val}mph`;
+      return system === "metric" ? `${val}kph` : `${val}mph`;
     default:
       return "";
   }
