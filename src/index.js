@@ -82,9 +82,15 @@ const createStruct = (...elements) =>
     return create(el);
   });
 
-const showWeather = ({ city, temp, feel, wind }, system) => {
+const showWeather = async ({ city, condition, temp, feel, wind }, system) => {
   const oldArticle = document.querySelector("article");
   if (oldArticle) oldArticle.remove();
+
+  const gifData = await getData(
+    `https://api.giphy.com/v1/gifs/translate?api_key=EJ5mLTdeAdWwx7wckwHCGwzbDLmU0HDR&s=${condition}`
+  );
+  const gif = create("img");
+  gif.src = gifData.data.images.original.url;
 
   const tempVal = create("dd", format("temp")(temp[system], system), "temp");
   const feelVal = create("dd", format("temp")(feel[system], system), "feel");
@@ -99,13 +105,14 @@ const showWeather = ({ city, temp, feel, wind }, system) => {
           "dl",
           [
             ["dt", "Temperature"],
-            [tempVal],
+            tempVal,
             ["dt", "Feels like"],
-            [feelVal],
+            feelVal,
             ["dt", "Wind"],
-            [windVal],
+            windVal,
           ],
         ],
+        gif,
       ],
     ])
   );
